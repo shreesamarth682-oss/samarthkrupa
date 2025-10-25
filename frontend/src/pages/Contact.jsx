@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../api/axiosInstance"; // ✅ use global axios instance
 import "./Contact.css";
 
 export default function Contact() {
@@ -11,17 +11,19 @@ export default function Contact() {
 
   const [status, setStatus] = useState("");
 
+  // ✅ Handle input change
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // ✅ Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus("Sending...");
 
     try {
-      const res = await axios.post("http://localhost:5000/api/inquiries", formData);
-      setStatus(res.data.message);
+      const res = await api.post("/inquiries", formData); // ✅ dynamic API base URL
+      setStatus(res.data.message || "Message sent successfully!");
       setFormData({ name: "", phone: "", message: "" }); // clear fields
     } catch (err) {
       console.error("Error submitting inquiry:", err);
@@ -31,6 +33,7 @@ export default function Contact() {
 
   return (
     <div className="contact-page">
+      {/* HERO SECTION */}
       <section className="contact-hero">
         <div className="overlay">
           <h1>Contact Us</h1>
@@ -38,6 +41,7 @@ export default function Contact() {
         </div>
       </section>
 
+      {/* CONTACT INFO */}
       <section className="contact-info">
         <div className="info-container">
           <div className="info-box">
@@ -55,6 +59,7 @@ export default function Contact() {
         </div>
       </section>
 
+      {/* CONTACT FORM */}
       <section className="contact-form-section">
         <h2>Send Us an Inquiry</h2>
         <p>Have a question or need a quote? Fill out the form below:</p>
