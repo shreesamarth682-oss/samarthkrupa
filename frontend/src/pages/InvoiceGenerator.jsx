@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api/axiosInstance"; // ✅ Use your configured Axios instance
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import "./InvoiceGenerator.css";
@@ -12,10 +12,10 @@ export default function InvoiceGenerator() {
     phone: "",
   });
 
-  // ✅ Fetch products
+  // ✅ Fetch products (auto handles local + Render)
   useEffect(() => {
-    axios
-      .get("http://localhost:5000/api/products")
+    api
+      .get("/products")
       .then((res) => setProducts(res.data))
       .catch((err) => console.error("Error fetching products:", err));
   }, []);
@@ -41,7 +41,7 @@ export default function InvoiceGenerator() {
     setSelectedProducts(selectedProducts.filter((p) => p._id !== id));
   };
 
-  // ✅ Total amount (no GST)
+  // ✅ Total amount
   const totalAmount = selectedProducts.reduce(
     (sum, p) => sum + p.price * p.qty,
     0
@@ -75,7 +75,7 @@ export default function InvoiceGenerator() {
     doc.text(`Customer: ${customer.name || "-"}`, 150, 21);
     doc.text(`Phone: ${customer.phone || "-"}`, 150, 26);
 
-    // Table
+    // Product Table
     const tableData = selectedProducts.map((p, i) => [
       i + 1,
       p.name,
@@ -127,17 +127,13 @@ export default function InvoiceGenerator() {
           type="text"
           placeholder="Customer Name"
           value={customer.name}
-          onChange={(e) =>
-            setCustomer({ ...customer, name: e.target.value })
-          }
+          onChange={(e) => setCustomer({ ...customer, name: e.target.value })}
         />
         <input
           type="text"
           placeholder="Customer Phone"
           value={customer.phone}
-          onChange={(e) =>
-            setCustomer({ ...customer, phone: e.target.value })
-          }
+          onChange={(e) => setCustomer({ ...customer, phone: e.target.value })}
         />
       </div>
 
@@ -212,14 +208,13 @@ export default function InvoiceGenerator() {
               </tbody>
             </table>
 
-            {/* ✅ Grand Total only */}
+            {/* ✅ Grand Total */}
             <div className="totals-display">
               <h3>Grand Total: Rs. {totalAmount.toFixed(2)}</h3>
             </div>
           </>
         )}
 
-        {/* Generate Button */}
         {selectedProducts.length > 0 && (
           <div className="invoice-footer">
             <button onClick={generatePDF}>📄 Generate PDF</button>
