@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api/axiosInstance"; // ✅ use your global axios config
 import "./AdminDashboard.css";
 
 export default function AdminDashboard() {
@@ -9,7 +9,7 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("products");
   const [products, setProducts] = useState([]);
   const [inquiries, setInquiries] = useState([]);
-  const [useUpload, setUseUpload] = useState(true); // ✅ toggle between upload and URL
+  const [useUpload, setUseUpload] = useState(true);
   const [form, setForm] = useState({
     name: "",
     category: "",
@@ -22,7 +22,7 @@ export default function AdminDashboard() {
   // ✅ Fetch all products
   const fetchProducts = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/products");
+      const res = await api.get("/products");
       setProducts(res.data);
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -32,7 +32,7 @@ export default function AdminDashboard() {
   // ✅ Fetch all inquiries
   const fetchInquiries = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/inquiries");
+      const res = await api.get("/inquiries");
       setInquiries(res.data);
     } catch (error) {
       console.error("Error fetching inquiries:", error);
@@ -58,7 +58,7 @@ export default function AdminDashboard() {
     formData.append("image", file);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/upload", formData, {
+      const res = await api.post("/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setForm({ ...form, image: res.data.imageUrl });
@@ -74,10 +74,10 @@ export default function AdminDashboard() {
     e.preventDefault();
     try {
       if (editingId) {
-        await axios.put(`http://localhost:5000/api/products/${editingId}`, form);
+        await api.put(`/products/${editingId}`, form);
         alert("✅ Product updated successfully!");
       } else {
-        await axios.post("http://localhost:5000/api/products", form);
+        await api.post("/products", form);
         alert("✅ Product added successfully!");
       }
       setForm({ name: "", category: "", price: "", description: "", image: "" });
@@ -104,7 +104,7 @@ export default function AdminDashboard() {
   // ✅ Delete product
   const handleDeleteProduct = async (id) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
-      await axios.delete(`http://localhost:5000/api/products/${id}`);
+      await api.delete(`/products/${id}`);
       fetchProducts();
     }
   };
@@ -113,7 +113,7 @@ export default function AdminDashboard() {
   const handleDeleteInquiry = async (id) => {
     if (window.confirm("Are you sure you want to delete this inquiry?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/inquiries/${id}`);
+        await api.delete(`/inquiries/${id}`);
         alert("🗑️ Inquiry deleted successfully!");
         fetchInquiries();
       } catch (error) {
@@ -125,37 +125,33 @@ export default function AdminDashboard() {
   // ✅ Logout Function
   const handleLogout = () => {
     if (window.confirm("Are you sure you want to logout?")) {
-      localStorage.removeItem("adminAuth"); // Clear login session
-      navigate("/admin/login"); // Redirect to login page
+      localStorage.removeItem("adminAuth");
+      navigate("/admin/login");
     }
   };
 
   return (
     <div className="admin-dashboard">
+      {/* HEADER */}
       <div className="admin-header">
-  <div className="header-top">
-    <h1 className="dashboard-title">🧰 Admin Dashboard</h1>
+        <div className="header-top">
+          <h1 className="dashboard-title">🧰 Admin Dashboard</h1>
+          <button className="logout-btn" onClick={handleLogout}>
+            🚪 Logout
+          </button>
+        </div>
+        <p>Manage products, inquiries, and billing from one place.</p>
+        <div className="center-btn">
+          <button
+            className="generate-bill-btn"
+            onClick={() => navigate("/admin/invoice")}
+          >
+            🧾 Generate Bill
+          </button>
+        </div>
+      </div>
 
-    {/* ✅ Logout Button */}
-    <button className="logout-btn" onClick={handleLogout}>
-      🚪 Logout
-    </button>
-  </div>
-  <p>Manage products, inquiries, and billing from one place.</p>
-
-  {/* ✅ Generate Bill Button */}
-  <div className="center-btn">
-    <button
-      className="generate-bill-btn"
-      onClick={() => navigate("/admin/invoice")}
-    >
-      🧾 Generate Bill
-    </button>
-  </div>
-</div>
-
-
-      {/* Tabs */}
+      {/* TABS */}
       <div className="tabs">
         <button
           className={activeTab === "products" ? "active" : ""}
@@ -201,7 +197,7 @@ export default function AdminDashboard() {
               onChange={handleChange}
             />
 
-            {/* ✅ Toggle between Upload or URL */}
+            {/* Upload vs URL */}
             <div className="image-option-toggle">
               <label>
                 <input
@@ -233,7 +229,6 @@ export default function AdminDashboard() {
               />
             )}
 
-            {/* ✅ Preview */}
             {form.image && (
               <div className="preview-container">
                 <img src={form.image} alt="Preview" className="image-preview" />
