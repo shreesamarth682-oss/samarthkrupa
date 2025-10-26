@@ -21,7 +21,7 @@ export default function Home() {
       <section className="home-about">
         <div className="about-inner">
           <img
-            src="https://www.addressofchoice.com/aoc_assets/elevation/41721/Shree_Samarth_Krupa_Complex_elevation_2.jpg"
+            src="https://res.cloudinary.com/dndqkry1y/image/upload/v1761456628/shree-samarth-krupa/tfjj1umuzhmiwilha5ui.png"
             alt="Building Material"
             className="about-img"
           />

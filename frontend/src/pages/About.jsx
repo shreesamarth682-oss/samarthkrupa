@@ -18,7 +18,7 @@ export default function About() {
       <section className="about-story">
         <div className="story-container">
           <img
-            src="https://housing-images.n7net.in/4f2250e8/23f3448c71017b79ca6726b1c4ba5912/v0/large/shree_samarth_krupa-dombivli_west-thane-reputed_builder.jpg"
+            src="https://res.cloudinary.com/dndqkry1y/image/upload/v1761456628/shree-samarth-krupa/tfjj1umuzhmiwilha5ui.png"
             alt="Shop Building Material"
             className="story-image"
           />
